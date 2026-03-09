@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Relaxing Bubble Pop</title>
+<style>
+body{
+    margin:0;
+    background:#0f172a;
+    overflow:hidden;
+    font-family:sans-serif;
+    color:white;
+}
+
+#score{
+    position:absolute;
+    top:10px;
+    left:20px;
+    font-size:20px;
+}
+
+canvas{
+    display:block;
+}
+</style>
+</head>
+
+<body>
+
+<div id="score">Bubbles Popped: 0</div>
+<canvas id="game"></canvas>
+
+<script>
+
+const canvas = document.getElementById("game")
+const ctx = canvas.getContext("2d")
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+let bubbles=[]
+let score=0
+
+function random(min,max){
+return Math.random()*(max-min)+min
+}
+
+class Bubble{
+
+constructor(){
+this.x=random(0,canvas.width)
+this.y=canvas.height+50
+this.radius=random(20,50)
+this.speed=random(0.5,2)
+this.color=`hsl(${random(180,260)},70%,70%)`
+}
+
+draw(){
+ctx.beginPath()
+ctx.arc(this.x,this.y,this.radius,0,Math.PI*2)
+ctx.fillStyle=this.color
+ctx.fill()
+}
+
+update(){
+this.y-=this.speed
+this.draw()
+}
+
+}
+
+function spawnBubble(){
+bubbles.push(new Bubble())
+}
+
+setInterval(spawnBubble,800)
+
+canvas.addEventListener("click",(e)=>{
+
+let mouseX=e.clientX
+let mouseY=e.clientY
+
+bubbles.forEach((bubble,index)=>{
+
+let dx=mouseX-bubble.x
+let dy=mouseY-bubble.y
+let distance=Math.sqrt(dx*dx+dy*dy)
+
+if(distance<bubble.radius){
+
+bubbles.splice(index,1)
+score++
+document.getElementById("score").innerText="Bubbles Popped: "+score
+
+}
+
+})
+
+})
+
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+bubbles.forEach((bubble,index)=>{
+
+bubble.update()
+
+if(bubble.y<-50){
+bubbles.splice(index,1)
+}
+
+})
+
+requestAnimationFrame(animate)
+
+}
+
+animate()
+
+</script>
+</body>
+</html>
